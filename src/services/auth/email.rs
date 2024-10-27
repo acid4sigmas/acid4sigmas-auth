@@ -1,16 +1,26 @@
-/*use acid4sigmas_models::{
+use acid4sigmas_models::{
     secrets::SECRET_KEY,
-    utils::jwt::{JwtToken, UserClaims},
+    utils::{
+        jwt::{JwtToken, UserClaims},
+        token_handler::{TokenHandler, UserTokenHandler},
+    },
 };
 use actix_web::HttpResponse;
 
-pub async fn send_verify_email_service(token: &str) -> Result<HttpResponse, (String, u16)> {
-    let jwt_token = JwtToken::new(SECRET_KEY.get().unwrap());
+use crate::services::ws::get_ws_client;
 
-    let claims: UserClaims = jwt_token
-        .decode_jwt::<UserClaims>(&token)
-        .map_err(|e| (format!("failed to decode token: {}", e), 500))?;
+pub async fn send_verify_email_service(token: &str) -> Result<HttpResponse, (String, u16)> {
+    println!("hello world");
+
+    let client_lock = get_ws_client().await;
+
+    let mut client = client_lock.lock().await;
+
+    let mut token_handler = UserTokenHandler::new(SECRET_KEY.get().unwrap(), client).await;
+
+    let claims = token_handler.verify_token(&token).await?;
+
+    println!("claims: {:?}", claims);
 
     Ok(HttpResponse::Ok().finish())
 }
-*/

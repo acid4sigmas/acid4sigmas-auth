@@ -85,12 +85,11 @@ pub async fn login_service(body: LoginRequest) -> Result<HttpResponse, (String, 
                     .map_err(|e| (e.to_string(), 500))?;
 
                 if verify_pw {
-                    let token_handler =
-                        UserTokenHandler::new(SECRET_KEY.get().unwrap(), USER_TOKEN_EXPIRY, client);
+                    let token_handler = UserTokenHandler::new(SECRET_KEY.get().unwrap(), client);
 
                     let gen_token = token_handler
                         .await
-                        .generate_token(user.uid)
+                        .generate_token(user.uid, USER_TOKEN_EXPIRY)
                         .await
                         .map_err(|e| (e.to_string(), (500)))?;
 

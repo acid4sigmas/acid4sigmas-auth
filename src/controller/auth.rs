@@ -1,4 +1,6 @@
-use crate::services::auth::{login::login_service, registration::register_service};
+use crate::services::auth::{
+    email::send_verify_email_service, login::login_service, registration::register_service,
+};
 use acid4sigmas_models::{
     error_response,
     models::auth::{LoginRequest, RegisterRequest},
@@ -29,11 +31,15 @@ pub async fn login(req_body: web::Json<LoginRequest>) -> HttpResponse {
 pub async fn send_verify_email(req: HttpRequest) -> HttpResponse {
     match req.headers().get(AUTHORIZATION) {
         Some(header_value) => match header_value.to_str() {
-            Ok(_token) => {}
+            Ok(token) => {
+                let result = send_verify_email_service(token).await;
+                match result {
+                    Ok(response) => return response,
+                    Err((error_msg, error_code)) => return error_response!(error_code, error_msg),
+                }
+            }
             Err(e) => return error_response!(400, &format!("failed to convert: {}", e)),
         },
         None => return error_response!(401, "Authorization header missing"),
     }
-
-    HttpResponse::Ok().finish()
 }
