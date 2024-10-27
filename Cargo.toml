@@ -8,7 +8,7 @@ actix-web = "4.9.0"
 actix-ws = "0.3.0"
 futures-util = "0.3.31"
 anyhow = "1.0.89"
-acid4sigmas-models = { path = "../acid4sigmas-model"}
+acid4sigmas-models = { git = "https://github.com/acid4sigmas/acid4sigmas-model" }
 tokio-tungstenite =  { version = "*", features = ["tls"] }
 tungstenite = "0.17"
 tokio = { version = "1.41.0", features = ["full"] }
